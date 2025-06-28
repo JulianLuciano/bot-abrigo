@@ -1,4 +1,5 @@
 import requests
+import logging
 import os
 import utils as ut
 from telegram import Update, ReplyKeyboardMarkup
@@ -10,6 +11,18 @@ from telegram.ext import (
     filters,
     ConversationHandler
 )
+
+# Configurar logger global
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[
+        logging.FileHandler("bot.log"),        # Guarda en archivo
+        logging.StreamHandler()                # Muestra en consola
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 # Estados de la conversación
 ASK_HOURS, ASK_COORDINATES, ASK_RAIN, RESPOND_RAIN = range(4)
@@ -98,7 +111,9 @@ async def ask_for_coordinates(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def handle_coordinates(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
+        logger.info("📍 Entró en handle_coordinates")
         text = update.message.text.strip()
+        logger.info(f"Texto recibido: {text}")
         
         # Diccionario de atajos secretos (se aceptan variantes de mayúsculas y tildes)
         location_shortcuts = {
@@ -122,6 +137,7 @@ async def handle_coordinates(update: Update, context: ContextTypes.DEFAULT_TYPE)
         for shortcut, coords in location_shortcuts.items():
             if normalized_text == shortcut.lower().replace(" ", ""):
                 lat, lon = coords
+                logger.info(f"Detectado shortcut '{shortcut}' → {lat},{lon}")
                 break
         
         # Si no es un atajo, procesar como coordenadas normales
@@ -132,16 +148,21 @@ async def handle_coordinates(update: Update, context: ContextTypes.DEFAULT_TYPE)
             if (len(parts) != 2 or 
                 not all(part.replace(".", "").lstrip("-").isdigit() for part in parts) or 
                 cleaned_text.count(".") > 2):
+                logger.warning("Formato incorrecto de coordenadas")
                 await update.message.reply_text("⚠️ Formato incorrecto. Usá: lat,lon \nEjemplo: -34.58,-58.42")
                 return ASK_COORDINATES
                 
             lat, lon = map(float, parts)
+            logger.info(f"Coordenadas ingresadas: {lat},{lon}")
         hours_ahead = context.user_data.get('hours_ahead', 0)
 
         payload = {"lat": lat, "lon": lon, 'lead': hours_ahead}
+        logger.info(f"Payload para API: {payload}")
         
         r = requests.post(API_URL, json=payload)
+        logger.info(f"Respuesta de la API: status {r.status_code}")
         if r.status_code == 200:
+            logger.info(f"Datos recibidos: {data}")
             data = r.json()
             class_1st = data["class_1st"]
             prob_1st = round(data["prob_1st"] * 100)
@@ -185,13 +206,16 @@ async def handle_coordinates(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     input_field_placeholder='Sí o No?'
                 )
             )
+            logger.info("📩 Mensaje enviado correctamente")
             return ASK_RAIN
             
         else:
+            logger.error("❌ Falló la API")
             await update.message.reply_text("⚠️ Error al consultar la predicción.")
             return ConversationHandler.END
             
     except Exception as e:
+        logger.exception(f"🚨 Error en handle_coordinates: {e}")
         print(f"Error: {e}")
         await update.message.reply_text("❗ Por favor mandá coordenadas como: -34.58,-58.42. \nAntes, volvé a iniciarme con /start")
         return ConversationHandler.END
@@ -281,9 +305,7 @@ def create_bot_application():
 
 async def start_bot_async():
     app = create_bot_application()
-    await app.initialize()
-    await app.start()
-    await app.updater.start_polling()
+    await app.start_polling()
 
 def run_bot():
     app = create_bot_application()
