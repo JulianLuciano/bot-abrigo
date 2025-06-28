@@ -1,11 +1,10 @@
 import asyncio
 from fastapi import FastAPI
-from api import app as fastapi_app  # tu FastAPI API con rutas ya definidas
-from bot import start_bot_async     # tu función async para arrancar bot
+from api import app as fastapi_app
+from bot import start_bot_async
 
-app = fastapi_app  # Exportamos la variable global app para Render
+app = fastapi_app  # esto es lo que Render importa
 
 @app.on_event("startup")
 async def startup_event():
-    # Lanzamos el bot como tarea concurrente sin bloquear
     asyncio.create_task(start_bot_async())

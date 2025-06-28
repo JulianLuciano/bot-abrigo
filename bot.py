@@ -305,7 +305,7 @@ def create_bot_application():
 
 async def start_bot_async():
     app = create_bot_application()
-    await app.run_polling()
+    await app.run_polling(close_loop=False)
 
 def run_bot():
     app = create_bot_application()
