@@ -284,7 +284,6 @@ async def start_bot_async():
     await app.initialize()
     await app.start()
     await app.updater.start_polling()
-    await app.updater.idle()
 
 def run_bot():
     app = create_bot_application()
