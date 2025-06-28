@@ -1,12 +1,11 @@
-import threading
 import asyncio
-from api import app as fastapi_app
-from bot import start_bot_async
+from fastapi import FastAPI
+from api import app as fastapi_app  # tu FastAPI API con rutas ya definidas
+from bot import start_bot_async     # tu función async para arrancar bot
 
-def start_fastapi():
-    import uvicorn
-    uvicorn.run(fastapi_app, host="0.0.0.0", port=10000)
+app = fastapi_app  # Exportamos la variable global app para Render
 
-if __name__ == "__main__":
-    threading.Thread(target=start_fastapi, daemon=True).start()
-    asyncio.run(start_bot_async())
+@app.on_event("startup")
+async def startup_event():
+    # Lanzamos el bot como tarea concurrente sin bloquear
+    asyncio.create_task(start_bot_async())
