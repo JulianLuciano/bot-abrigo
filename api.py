@@ -8,6 +8,7 @@ import numpy as np
 import weather as we
 
 app = FastAPI()
+router = APIRouter()
 model = CatBoostClassifier()  # Crear instancia vacía
 model.load_model("./modelo_catboost3.cbm")  # Cargar el modelo entrenado
 
