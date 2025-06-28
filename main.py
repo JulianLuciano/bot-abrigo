@@ -1,14 +1,12 @@
-from bot import run_bot
-from api import app
 import threading
+import asyncio
+from api import app as fastapi_app
+from bot import start_bot_async
 
 def start_fastapi():
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=10000)
+    uvicorn.run(fastapi_app, host="0.0.0.0", port=10000)
 
 if __name__ == "__main__":
-    # Inicia FastAPI en un thread
-    threading.Thread(target=start_fastapi).start()
-
-    # Inicia el bot en el hilo principal
-    run_bot()
+    threading.Thread(target=start_fastapi, daemon=True).start()
+    asyncio.run(start_bot_async())
