@@ -1,4 +1,5 @@
 import requests
+import os
 import utils as ut
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import (
@@ -14,6 +15,7 @@ from telegram.ext import (
 ASK_HOURS, ASK_COORDINATES, ASK_RAIN, RESPOND_RAIN = range(4)
 
 # TOKEN = ""
+TOKEN = os.getenv("TOKEN")
 API_URL = "http://localhost:8000/predecir"
 VIDEO_HELP_ID = "BAACAgEAAxkBAAIDlWg-WReZDKCtaoSzifGdWYoMjiKxAALNBQACtDn4RZHLQHkH-6GqNgQ" 
 
