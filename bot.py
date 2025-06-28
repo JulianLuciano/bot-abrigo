@@ -308,4 +308,5 @@ async def start_bot_async():
     app = create_bot_application()
     await app.initialize()
     await app.start()
-    asyncio.create_task(app.run_polling())  # ✅ esta forma sí sirve en PTB 20+
+    await app.updater.start_polling()  # 👈 usamos updater directamente, no run_polling
+    print("🤖 Bot arrancado")
