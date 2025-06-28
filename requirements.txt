@@ -7,3 +7,4 @@ catboost
 openmeteo-requests
 requests-cache
 retry-requests
+python-telegram-bot==20.3
