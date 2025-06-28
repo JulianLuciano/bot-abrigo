@@ -241,28 +241,42 @@ async def abrigo_nhs(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await ask_for_hours(update, context)
 
 def run_bot():
-    application = ApplicationBuilder().token(TOKEN).build()
-
-    # Handler para el comando /start
-    start_handler = CommandHandler("start", start)
-
-    # Handler de conversación con estados
-    conv_handler = ConversationHandler(
-        entry_points=[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_hours)],
+    app = ApplicationBuilder().token(TOKEN).build()
+    
+    # Handler para abrigo_nhs
+    nhs_conversation_handler = ConversationHandler(
+        entry_points=[CommandHandler("abrigo_nhs", abrigo_nhs)],
         states={
-            ASK_HOURS: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_coordinates)],
-            ASK_COORDINATES: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_rain)],
-            ASK_RAIN: [MessageHandler(filters.TEXT & ~filters.COMMAND, respond_rain)],
+            ASK_HOURS: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_hours)],
+            ASK_COORDINATES: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_coordinates)],
+            ASK_RAIN: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_rain_response)],
         },
-        fallbacks=[CommandHandler("start", start)],
+        fallbacks=[CommandHandler('cancel', cancel)],
+        allow_reentry=True
     )
-
-    # Registrar handlers
-    application.add_handler(start_handler)
-    application.add_handler(conv_handler)
-
-    # Iniciar el bot (polling)
-    application.run_polling()
+    
+    # Handler para los otros comandos de abrigo
+    abrigo_conversation_handler = ConversationHandler(
+        entry_points=[
+            CommandHandler("abrigo", abrigo),
+            CommandHandler("abrigo_2h", abrigo_2h),
+            CommandHandler("abrigo_3h", abrigo_3h),
+            CommandHandler("abrigo_4h", abrigo_4h)
+        ],
+        states={
+            ASK_COORDINATES: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_coordinates)],
+            ASK_RAIN: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_rain_response)],
+        },
+        fallbacks=[CommandHandler('cancel', cancel)],
+        allow_reentry=True
+    )
+    
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(nhs_conversation_handler)
+    app.add_handler(abrigo_conversation_handler)
+    
+    app.run_polling()
 
 def main():
     app = ApplicationBuilder().token(TOKEN).build()
