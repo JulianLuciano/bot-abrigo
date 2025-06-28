@@ -16,7 +16,7 @@ ASK_HOURS, ASK_COORDINATES, ASK_RAIN, RESPOND_RAIN = range(4)
 
 # TOKEN = ""
 TOKEN = os.getenv("TOKEN")
-API_URL = "http://localhost:8000/predecir"
+API_URL = os.getenv("API_URL")
 VIDEO_HELP_ID = "BAACAgEAAxkBAAIDlWg-WReZDKCtaoSzifGdWYoMjiKxAALNBQACtDn4RZHLQHkH-6GqNgQ" 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
