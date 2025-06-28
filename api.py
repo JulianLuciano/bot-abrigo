@@ -5,6 +5,8 @@ import pandas as pd
 from datetime import datetime, timezone, timedelta
 import numpy as np
 import weather as we
+import threading
+from bot import main as start_bot
 
 app = FastAPI()
 model = CatBoostClassifier()  # Crear instancia vacía
@@ -74,3 +76,6 @@ def predecir(ubicacion: Ubicacion):
     })
 
     return prob_df.iloc[0].to_dict()
+
+# Lanza el bot en segundo plano
+threading.Thread(target=start_bot, daemon=True).start()

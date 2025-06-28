@@ -13,7 +13,7 @@ from telegram.ext import (
 # Estados de la conversación
 ASK_HOURS, ASK_COORDINATES, ASK_RAIN, RESPOND_RAIN = range(4)
 
-TOKEN = "7104420307:AAGj4vR0qxkkk5O15oUyybUyVC20m3As0b4"
+TOKEN = ""
 API_URL = "http://localhost:8000/predecir"
 VIDEO_HELP_ID = "BAACAgEAAxkBAAIDlWg-WReZDKCtaoSzifGdWYoMjiKxAALNBQACtDn4RZHLQHkH-6GqNgQ" 
 
