@@ -16,3 +16,4 @@ EXPOSE 10000
 
 # Comando para iniciar la API y el bot
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]
+
