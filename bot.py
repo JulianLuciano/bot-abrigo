@@ -1,5 +1,5 @@
 import requests
-import ascyncio
+import asyncio
 import logging
 import os
 import utils as ut
