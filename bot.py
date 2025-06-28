@@ -13,7 +13,7 @@ from telegram.ext import (
 # Estados de la conversación
 ASK_HOURS, ASK_COORDINATES, ASK_RAIN, RESPOND_RAIN = range(4)
 
-TOKEN = ""
+TOKEN = "7104420307:AAGj4vR0qxkkk5O15oUyybUyVC20m3As0b4"
 API_URL = "http://localhost:8000/predecir"
 VIDEO_HELP_ID = "BAACAgEAAxkBAAIDlWg-WReZDKCtaoSzifGdWYoMjiKxAALNBQACtDn4RZHLQHkH-6GqNgQ" 
 
@@ -237,6 +237,30 @@ async def abrigo_4h(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def abrigo_nhs(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await ask_for_hours(update, context)
+
+def run_bot():
+    application = ApplicationBuilder().token(TOKEN).build()
+
+    # Handler para el comando /start
+    start_handler = CommandHandler("start", start)
+
+    # Handler de conversación con estados
+    conv_handler = ConversationHandler(
+        entry_points=[MessageHandler(filters.TEXT & ~filters.COMMAND, ask_hours)],
+        states={
+            ASK_HOURS: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_coordinates)],
+            ASK_COORDINATES: [MessageHandler(filters.TEXT & ~filters.COMMAND, ask_rain)],
+            ASK_RAIN: [MessageHandler(filters.TEXT & ~filters.COMMAND, respond_rain)],
+        },
+        fallbacks=[CommandHandler("start", start)],
+    )
+
+    # Registrar handlers
+    application.add_handler(start_handler)
+    application.add_handler(conv_handler)
+
+    # Iniciar el bot (polling)
+    application.run_polling()
 
 def main():
     app = ApplicationBuilder().token(TOKEN).build()

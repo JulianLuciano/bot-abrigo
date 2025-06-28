@@ -1,25 +1,12 @@
+# render.yaml
+
 services:
   - type: web
-    name: abrigo-api
+    name: bot-abrigo 
     env: python
     plan: free
-    buildCommand: ""
-    startCommand: uvicorn api:app --host 0.0.0.0 --port 10000
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
     envVars:
       - key: TOKEN
-        sync: false
-      - key: MODELO_PATH
-        value: modelo_catboost3.cbm
-
-  - type: worker
-    name: abrigo-bot
-    env: python
-    plan: free
-    buildCommand: ""
-    startCommand: python bot.py
-    envVars:
-      - key: TOKEN
-        sync: false
-      - key: API_URL
-        value: https://abrigo-api.onrender.com/prediccion
-
+        value: tu_token_aqui  # O mejor, crealo desde la UI de Render como variable secreta
